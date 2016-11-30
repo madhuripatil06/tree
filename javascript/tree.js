@@ -10,12 +10,17 @@ var drawCircles = function(x_scale, y_scale, selection){
     var tree = selection.selectAll("circle")
         .data(data);
 
-    tree.enter()
-        .append("circle")
-        .attr("cx",function(d, i){ console.log(d[0]); return d[0]*50})
-        .attr("cy",function(d, i){ return d[1]*50})
+    var g = tree.enter()
+            .append("g")
+            .attr("transform", function(d){return "translate("+d[0]*50 +","+ d[1]*50+")"})
+
+    g.append("circle")
         .attr("r", 20)
         .attr("class", "leaf");
+
+    g.append("text")
+        .attr("dx", function(d){return -8})
+        .text(function(d){return d[0]});
 };
 
 var load = function(){
