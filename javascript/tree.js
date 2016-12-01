@@ -4,7 +4,7 @@ const CIRCLE_RADIUS = 20;
 const START_X = 500;
 const START_Y = 100;
 const EDGE_LENGHT = 50;
-var data_array = [1,2,3];
+var data_array = ["+",1,["+", 2,["+", 3, 4]]];
 
 var generateLineData = function(input, curr_x, curr_y){
     var edges = [
@@ -17,9 +17,10 @@ var generateLineData = function(input, curr_x, curr_y){
 var generateCircleData = function(input, curr_x, curr_y){
     var circleData = [
          {x: curr_x, y: curr_y, name: input[0]},
-         {x: curr_x - EDGE_LENGHT, y: (curr_y*2), name: input[1]},
-         {x: curr_x + EDGE_LENGHT, y: (curr_y*2), name: input[1]},
+         {x: curr_x - EDGE_LENGHT, y: (curr_y+START_Y), name: input[1]}
     ];
+    if(input.length == 3)
+        circleData.push({x: curr_x + EDGE_LENGHT, y: (curr_y+ START_Y), name: input[2]})
     return circleData;
 };
 
@@ -34,6 +35,23 @@ var drawLines = function(selection, data){
         .attr("x2", function(d){ return d.x2})
         .attr("y2", function(d){ return d.y2})
         .attr("class", "edge");
+};
+
+var result = [];
+var row_number = 1;
+
+var generateCirclePositions = function(data, curr_x, curr_y){
+    if(typeof(data[2]) == "object"){
+        result = result.concat(generateCircleData([data[0], data[1]], curr_x, curr_y));
+        row_number += 1;
+        curr_x += EDGE_LENGHT;
+        curr_y += START_Y;
+        result = result.concat(generateCirclePositions(data[2], curr_x, curr_y));
+    }
+    else{
+       result = result.concat(generateCircleData(data, curr_x, curr_y));
+    }
+    return result
 };
 
 var drawCircles = function(x_scale, y_scale, selection, data){
@@ -68,9 +86,10 @@ var load = function(){
         .attr("width", WIDTH);
 
     var data = generateLineData(data_array, START_X, START_Y);
-    var circleData = generateCircleData(data_array, START_X, START_Y);
-    drawCircles(x_scale, y_scale, container, circleData);
     drawLines(container, data);
+
+    var d=generateCirclePositions(data_array, START_X, START_Y);
+    drawCircles(x_scale, y_scale, container, d);
 
 };
 
