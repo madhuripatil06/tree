@@ -1,4 +1,10 @@
 .leaf {
     stroke : black;
     fill: none;
+    stroke-width : 2;
+}
+
+.edge {
+      stroke : black;
+      stroke-width : 2;
 }

@@ -5,15 +5,6 @@ const START_X = 500;
 const START_Y = 100;
 const EDGE_LENGHT = 50;
 var data_array = [1,2,3];
-var data = [
-    {x: 500, y: 100, name: 1},
-    {x: 450, y: 200, name: 2},
-    {x: 550, y: 200, name: 3}
-];
-var lineData = [
-    {x1: 500, y1:120 , x2: 450, y2: 180  },
-    {x1: 500, y1:120 , x2: 550, y2: 180  },
-];
 
 var generateLineData = function(input, curr_x, curr_y){
     var edges = [
@@ -23,7 +14,14 @@ var generateLineData = function(input, curr_x, curr_y){
     return edges;
 };
 
-
+var generateCircleData = function(input, curr_x, curr_y){
+    var circleData = [
+         {x: curr_x, y: curr_y, name: input[0]},
+         {x: curr_x - EDGE_LENGHT, y: (curr_y*2), name: input[1]},
+         {x: curr_x + EDGE_LENGHT, y: (curr_y*2), name: input[1]},
+    ];
+    return circleData;
+};
 
 var drawLines = function(selection, data){
     var edges = selection.selectAll("line")
@@ -35,10 +33,10 @@ var drawLines = function(selection, data){
         .attr("y1", function(d){ return d.y1})
         .attr("x2", function(d){ return d.x2})
         .attr("y2", function(d){ return d.y2})
-        .style("stroke", "black");
+        .attr("class", "edge");
 };
 
-var drawCircles = function(x_scale, y_scale, selection){
+var drawCircles = function(x_scale, y_scale, selection, data){
     var tree = selection.selectAll("circle")
         .data(data);
 
@@ -70,8 +68,8 @@ var load = function(){
         .attr("width", WIDTH);
 
     var data = generateLineData(data_array, START_X, START_Y);
-
-    drawCircles(x_scale, y_scale, container);
+    var circleData = generateCircleData(data_array, START_X, START_Y);
+    drawCircles(x_scale, y_scale, container, circleData);
     drawLines(container, data);
 
 };
