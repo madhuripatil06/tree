@@ -4,17 +4,18 @@ const CIRCLE_RADIUS = 20;
 const START_X = 500;
 const START_Y = 100;
 const EDGE_LENGHT = 50;
-var data_array = ["+",1,["+", 2,["+", 3, 4]]];
+var data_array = ["+",1,["+", 2, ["-", 5, 6]]];
 
 var generateLineData = function(input, curr_x, curr_y){
     var edges = [
-    {x1: curr_x, y1: curr_y + CIRCLE_RADIUS, x2: curr_x - EDGE_LENGHT,y2: (curr_y*2) - CIRCLE_RADIUS},
-    {x1: curr_x, y1: curr_y + CIRCLE_RADIUS, x2: curr_x + EDGE_LENGHT,y2: (curr_y*2) - CIRCLE_RADIUS},
+    {x1: curr_x, y1: curr_y + CIRCLE_RADIUS, x2: curr_x - EDGE_LENGHT,y2: (curr_y+START_Y) - CIRCLE_RADIUS},
+    {x1: curr_x, y1: curr_y + CIRCLE_RADIUS, x2: curr_x + EDGE_LENGHT,y2: (curr_y+START_Y) - CIRCLE_RADIUS},
     ];
     return edges;
 };
 
 var generateCircleData = function(input, curr_x, curr_y){
+    console.log("-----------------", input);
     var circleData = [
          {x: curr_x, y: curr_y, name: input[0]},
          {x: curr_x - EDGE_LENGHT, y: (curr_y+START_Y), name: input[1]}
@@ -38,20 +39,22 @@ var drawLines = function(selection, data){
 };
 
 var result = [];
-var row_number = 1;
+var line = [];
 
-var generateCirclePositions = function(data, curr_x, curr_y){
+var generatePositions = function(data, curr_x, curr_y){
     if(typeof(data[2]) == "object"){
         result = result.concat(generateCircleData([data[0], data[1]], curr_x, curr_y));
-        row_number += 1;
         curr_x += EDGE_LENGHT;
         curr_y += START_Y;
-        result = result.concat(generateCirclePositions(data[2], curr_x, curr_y));
+        result = result.concat(generatePositions(data[2], curr_x, curr_y));
+        line = line.concat(generatePositions(data[2], curr_x, curr_y));
     }
     else{
+       console.log(data.length, '=============')
+       line = line.concat(generateLineData(data, curr_x, curr_y));
        result = result.concat(generateCircleData(data, curr_x, curr_y));
     }
-    return result
+    return {"circles":result, "line": line};
 };
 
 var drawCircles = function(x_scale, y_scale, selection, data){
@@ -85,12 +88,11 @@ var load = function(){
         .attr("height", HEIGHT)
         .attr("width", WIDTH);
 
-    var data = generateLineData(data_array, START_X, START_Y);
-    drawLines(container, data);
+    var circles=generatePositions(data_array, START_X, START_Y);
+    drawCircles(x_scale, y_scale, container, circles["circles"]);
 
-    var d=generateCirclePositions(data_array, START_X, START_Y);
-    drawCircles(x_scale, y_scale, container, d);
-
+    var line = circles["line"]
+//    drawLines(container, line);
 };
 
 window.onload = load;
